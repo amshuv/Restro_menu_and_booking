@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Reservation Form</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button {
+            border: none;
+            background-color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            font-size: 16px;
+            margin: 4px 2px;
+            color: aliceblue;
+        }
+        .button:hover{
+            border: solid 5px aliceblue;
+        }
+
+        #availabilityStatus {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body style="background-color: lightblue;">
+    <div class="container">
+        <h2>Reservation Form</h2>
+        <form id="reservationForm">
+            <label for="guestName">Name of Guest:</label>
+            <input type="text" id="guestName" required>
+
+            <label for="reservationDate">Date:</label>
+            <input type="date" id="reservationDate" value="" required>
+
+            <label for="fromTime">From Time:</label>
+            <input type="time" id="fromTime" value="" required>
+
+            <label for="toTime">To Time:</label>
+            <input type="time" id="toTime" value="" required>
+
+            <label for="numOfGuests">Number of Guests:</label>
+            <select id="numOfGuests" required>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="8">8</option>
+            </select>
+<br><br>
+            <div style="display: inline-flex;">
+                <button class="button" type="button" id="checkAvailability">Check Availability</button>
+                <button class="button" type="submit" id="confirmReservation">Confirm Reservation</button>
+            </div>
+        </form>
+
+        <div id="availabilityStatus"></div>
+    </div>
+
+    <script>
+        var currentDateTime = new Date();
+        var currentDateString = currentDateTime.toISOString().slice(0, 10);
+        var currentTimeString = currentDateTime.toTimeString().slice(0, 5);
+
+        document.getElementById("reservationDate").value = currentDateString;
+        document.getElementById("fromTime").value = currentTimeString;
+
+        // Set the "to time" to at least half an hour ahead of the current time
+        currentDateTime.setMinutes(currentDateTime.getMinutes() + 30);
+        var toTimeString = currentDateTime.toTimeString().slice(0, 5);
+        document.getElementById("toTime").value = toTimeString;
+
+        var tableAvailability = {
+            "2": 4,  // 4 tables available for 2 guests
+            "4": 6,  // 6 tables available for 4 guests
+            "6": 3,  // 3 tables available for 6 guests
+            "8": 2   // 2 tables available for 8 guests
+        };
+
+        var reservations = {}; // Object to keep track of reservations for each time slot
+
+        // Function to check slot availability
+        function checkSlotAvailability(date, fromTime, toTime, numOfGuests) {
+            var tableKey = numOfGuests.toString();
+            if (tableAvailability[tableKey] > 0) {
+                // Check availability for the selected number of guests
+                var reservationKey = date + "-" + fromTime + "-" + toTime;
+                if (reservations[reservationKey] && reservations[reservationKey] >= 10) {
+                    return false; // All tables are reserved for this time slot
+                }
+                return true;
+            } else {
+                return false; // No tables available
+            }
+        }
+
+        // Reservation confirmation logic
+        function confirmReservation(guestName, reservationDate, fromTime, toTime, numOfGuests) {
+            var tableKey = numOfGuests.toString();
+
+            // Book a table based on the number of guests
+            tableAvailability[tableKey]--;
+
+            // Update reservations for the selected time slot
+            var reservationKey = reservationDate + "-" + fromTime + "-" + toTime;
+            if (!reservations[reservationKey]) {
+                reservations[reservationKey] = 1;
+            } else {
+                reservations[reservationKey]++;
+            }
+
+            // Display confirmation
+            alert("Thanks for booking confirmation, " + guestName + "!\nYour reservation for " + reservationDate + " from " + fromTime + " to " + toTime + " for " + numOfGuests + " guests has been confirmed.");
+        }
+
+        document.getElementById("checkAvailability").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            var guestName = document.getElementById("guestName").value;
+            var reservationDate = document.getElementById("reservationDate").value;
+            var fromTime = document.getElementById("fromTime").value;
+            var toTime = document.getElementById("toTime").value;
+            var numOfGuests = parseInt(document.getElementById("numOfGuests").value, 10);
+
+            if (guestName.trim() === "") {
+                alert("Please enter a valid guest name.");
+                return;
+            }
+
+            // Check if the selected time is at least 30 minutes ahead of the current time
+            var selectedTime = new Date(reservationDate + " " + fromTime);
+            if (selectedTime <= currentDateTime) {
+                alert("Please select a time at least 30 minutes in advance.");
+                return;
+            }
+
+            // Check availability logic
+            var isSlotAvailable = checkSlotAvailability(reservationDate, fromTime, toTime, numOfGuests);
+
+            var availabilityStatusElement = document.getElementById("availabilityStatus");
+
+            if (isSlotAvailable) {
+                availabilityStatusElement.textContent = "Availability Status: Available";
+            } else {
+                availabilityStatusElement.textContent = "Availability Status: No tables available for the selected time.";
+            }
+        });
+
+        document.getElementById("confirmReservation").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            var guestName = document.getElementById("guestName").value;
+            var reservationDate = document.getElementById("reservationDate").value;
+            var fromTime = document.getElementById("fromTime").value;
+            var toTime = document.getElementById("toTime").value;
+            var numOfGuests = parseInt(document.getElementById("numOfGuests").value, 10);
+
+            if (guestName.trim() === "") {
+                alert("Please enter a valid guest name.");
+                return;
+            }
+
+            // Check if the selected time is at least 30 minutes ahead of the current time
+            var selectedTime = new Date(reservationDate + " " + fromTime);
+            if (selectedTime <= currentDateTime) {
+                alert("Please select a time at least 30 minutes in advance.");
+                return;
+            }
+
+            // Check availability before confirming the reservation
+            var isSlotAvailable = checkSlotAvailability(reservationDate, fromTime, toTime, numOfGuests);
+
+            if (isSlotAvailable) {
+                // Confirm the reservation
+                confirmReservation(guestName, reservationDate, fromTime, toTime, numOfGuests);
+            } else {
+                // Display unavailability message
+                alert("Sorry, there are no tables available for the selected time.");
+            }
+        });
+    </script>
+</body>
+</html>

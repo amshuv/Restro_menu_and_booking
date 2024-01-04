@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Reservation Form</title>
+    <link rel="stylesheet" href="home.html">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .button {
+            border: none;
+            background-color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            font-size: 16px;
+            margin: 4px 2px;
+            color: aliceblue;
+        }
+        .button:hover{
+            border: solid 5px aliceblue;
+        }
+
+        #availabilityStatus {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body style="background-color: lightblue;">
+    <div class="container">
+        <h2>Reservation Form</h2>
+        <form id="reservationForm">
+            <label for="guestName">Name of Guest:</label>
+            <input type="text" id="guestName" required>
+
+            <label for="reservationDate">Date:</label>
+            <input type="date" id="reservationDate" value="" required>
+
+            <label for="reservationTime">Time:</label>
+            <input type="time" id="reservationTime" value="" required>
+
+            <label for="numOfGuests">Number of Guests:</label>
+            <input type="number" id="numOfGuests" value="2" min="1" required>
+
+            <div style="display: inline-flex;">
+                <button class="button" type="button" id="checkAvailability">Check Availability</button>
+                <button class="button" type="submit" id="confirmReservation">Confirm Reservation</button>
+            </div>
+        </form>
+
+        <div id="availabilityStatus"></div>
+    </div>
+
+    <script>
+        // Display current date and time as default values
+        var currentDateTime = new Date();
+        var currentDateString = currentDateTime.toISOString().slice(0, 10);
+        var currentTimeString = currentDateTime.toTimeString().slice(0, 5);
+
+        document.getElementById("reservationDate").value = currentDateString;
+        document.getElementById("reservationTime").value = currentTimeString;
+
+        document.getElementById("checkAvailability").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            var guestName = document.getElementById("guestName").value;
+            var reservationDate = document.getElementById("reservationDate").value;
+            var reservationTime = document.getElementById("reservationTime").value;
+
+            if (guestName.trim() === "") {
+                alert("Please enter a valid guest name.");
+                return; // Prevent form submission if the guest name is empty
+            }
+
+            // You can add your availability check logic here.
+            // For this example, we'll assume availability is always confirmed.
+            var availabilityStatus = "Available";
+
+            var availabilityStatusElement = document.getElementById("availabilityStatus");
+            availabilityStatusElement.textContent = "Availability Status: " + availabilityStatus;
+        });
+
+        document.getElementById("confirmReservation").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            var guestName = document.getElementById("guestName").value;
+            var reservationDate = document.getElementById("reservationDate").value;
+            var reservationTime = document.getElementById("reservationTime").value;
+
+            if (guestName.trim() === "") {
+                alert("Please enter a valid guest name.");
+                return; // Prevent form submission if the guest name is empty
+            }
+            
+            // You can add your reservation confirmation logic here.
+            // For this example, we'll simply display an alert.
+            alert("Thanks for booking confirmation, " + guestName + "!\nYour reservation for " + reservationDate + " at " + reservationTime + " has been confirmed.");
+        });
+    </script>
+</body>
+</html>
